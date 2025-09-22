@@ -7,58 +7,70 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
 
-    <div class="hub-container">
+    <div id="login-container" class="hub-container">
         <header class="hub-header">
-            <h1>Seu Hub de Projetos</h1>
-            <p>Selecione um sistema para continuar.</p>
+            <img src="/logo/logo_canella.png" alt="Logo da Empresa" class="logo">
+
+            <h1>Canellahub</h1>
+            <p>Por favor, faça login para continuar.</p>
+        </header>
+
+        <form id="login-form" class="login-form">
+            <input type="email" id="email" name="email" placeholder="Seu email" required>
+            <input type="password" id="password" name="password" placeholder="Sua senha" required>
+            <button type="submit" id="login-button">
+                <span class="button-text">Entrar</span>
+                <span class="loader"></span>
+            </button>
+            <p id="login-error" class="error-message"></p>
+        </form>
+    </div>
+
+    <div id="hub-content" class="hub-container" style="display: none;">
+        <header class="hub-header">
+            <div class="header-content">
+                <h1 id="welcome-message">Canellahub</h1>
+                <p>Selecione um sistema para continuar.</p>
+            </div>
+            <button id="logout-button" class="logout-btn">Sair <i data-feather="log-out"></i></button>
         </header>
 
         <main class="project-grid">
             <a href="#" class="project-card">
-                <div class="card-icon">
-                    <i data-feather="briefcase"></i>
-                </div>
-                <h3>Projeto Advocacia AI</h3>
-                <p>Agente de IA para atendimento automatizado via WhatsApp.</p>
+                <div class="card-icon"><i data-feather="briefcase"></i></div>
+                <h3>Clientes Data Base</h3>
+                <p>Consultar dados dos clientes</p>
             </a>
-
-            <a href="#" class="project-card">
-                <div class="card-icon">
-                    <i data-feather="bar-chart-2"></i>
-                </div>
+            <a href="https://contask.canellahub.com.br/" class="project-card">
+                <div class="card-icon"><i data-feather="bar-chart-2"></i></div>
                 <h3>Contask</h3>
-                <p>Sistema de gestão de tarefas e produtividade para contadores.</p>
+                <p>Sistema de gestão de tarefas e produtividade</p>
             </a>
-            
             <a href="#" class="project-card">
-                <div class="card-icon">
-                    <i data-feather="code"></i>
-                </div>
-                <h3>Meu Portfólio</h3>
-                <p>Site pessoal com meus principais trabalhos e tecnologias.</p>
+                <div class="card-icon"><i data-feather="code"></i></div>
+                <h3>In Progress...</h3>
+                <p>In Progress...</p>
             </a>
-
             <a href="#" class="project-card">
-                <div class="card-icon">
-                    <i data-feather="plus-circle"></i>
-                </div>
-                <h3>Novo Projeto</h3>
-                <p>Descrição do seu futuro projeto incrível que virá aqui.</p>
+                <div class="card-icon"><i data-feather="plus-circle"></i></div>
+                <h3>In Progress...</h3>
+                <p>In Progress...</p>
             </a>
         </main>
         
         <footer class="hub-footer">
-            <p>&copy; 2025 Seu Nome ou Sua Empresa. Todos os direitos reservados.</p>
+            <p>&copy; 2025</p>
         </footer>
     </div>
 
+    <script src="script.js"></script>
     <script>
-      feather.replace()
+      // O feather.replace() agora é chamado pelo script.js para garantir que os ícones sempre apareçam
     </script>
 </body>
 </html>
