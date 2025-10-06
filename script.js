@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showHub() {
         const userName = sessionStorage.getItem('hubUserName');
         if (userName) {
-            welcomeMessage.textContent = `Bem-vindo(a), ${userName}!`;
+            welcomeMessage.textContent = `Bem-vindo, ${userName}!`;
         }
 
         loginContainer.style.display = 'none';
