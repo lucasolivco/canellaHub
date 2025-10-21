@@ -100,6 +100,25 @@ body {
 
 .login-form button:hover { background-color: var(--accent-color-secondary); }
 
+.register-link {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+    text-align: center;
+}
+
+.register-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+    color: var(--accent-color-secondary);
+}
+
 /* ---- SPINNER DE CARREGAMENTO (Mantido) ---- */
 .loader { width: 18px; height: 18px; border: 2px solid var(--primary-text-color); border-bottom-color: transparent; border-radius: 50%; display: none; animation: rotation 1s linear infinite; }
 .login-form button.loading .button-text { visibility: hidden; }

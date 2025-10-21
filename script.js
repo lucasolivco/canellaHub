@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Elementos da página
+    // --- 1. CONFIGURAÇÃO DE AMBIENTE ---
+    const isProduction = window.location.hostname.includes('canellahub.com.br');
+
+    const API_BASE_URL = isProduction 
+        ? 'https://contask.canellahub.com.br/api' 
+        : 'http://localhost:3001/api';
+
+    const CONTASK_APP_URL = isProduction
+        ? 'https://contask.canellahub.com.br'
+        : 'http://localhost:5173';
+
+    const HUB_LOGIN_API_URL = `${API_BASE_URL}/auth/hub-login`;
+
+    // --- 2. ELEMENTOS DA PÁGINA ---
     const loginContainer = document.getElementById('login-container');
     const hubContent = document.getElementById('hub-content');
     const loginForm = document.getElementById('login-form');
@@ -8,9 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logout-button');
     const welcomeMessage = document.getElementById('welcome-message');
 
-    // URL da sua API de backend
-    const API_URL = 'http://localhost:3001/api/auth/hub-login';
-
+    // --- 3. FUNÇÕES DE CONTROLE DE UI ---
     function showHub() {
         const userName = sessionStorage.getItem('hubUserName');
         if (userName) {
@@ -19,10 +30,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loginContainer.style.display = 'none';
         hubContent.style.display = 'block';
+
+        // ✅ ATUALIZA O LINK DO CONTASK COM O TOKEN SSO
+        const ssoToken = sessionStorage.getItem('hubSsoToken');
+        const contaskLink = document.getElementById('contask-link'); // ✅ USA O ID QUE ADICIONAMOS
+        
+        if (contaskLink && ssoToken) {
+            contaskLink.href = `${CONTASK_APP_URL}/sso-login?token=${ssoToken}`;
+        } else if (contaskLink) {
+            contaskLink.href = '#';
+            contaskLink.style.opacity = '0.5';
+            contaskLink.style.cursor = 'not-allowed';
+            contaskLink.title = 'Faça login novamente para gerar um token de acesso.';
+        }
+
         feather.replace();
         animateCards();
     }
 
+    // --- 4. LÓGICA DE AUTENTICAÇÃO ---
     if (sessionStorage.getItem('isHubAuthenticated') === 'true') {
         showHub();
     } else {
@@ -39,23 +65,24 @@ document.addEventListener('DOMContentLoaded', () => {
         loginButton.disabled = true;
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(HUB_LOGIN_API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
             const data = await response.json();
 
-            if (response.ok && data.autenticado) {
+            if (response.ok && data.autenticado && data.ssoToken) {
                 sessionStorage.setItem('isHubAuthenticated', 'true');
                 sessionStorage.setItem('hubUserName', data.userName);
+                sessionStorage.setItem('hubSsoToken', data.ssoToken);
                 showHub();
             } else {
                 loginError.textContent = data.mensagem || 'Credenciais inválidas.';
             }
         } catch (error) {
             console.error('Erro de conexão:', error);
-            loginError.textContent = 'Não foi possível conectar ao servidor.';
+            loginError.textContent = 'Não foi possível conectar ao servidor de autenticação.';
         } finally {
             loginButton.classList.remove('loading');
             loginButton.disabled = false;
@@ -66,10 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutButton.addEventListener('click', () => {
             sessionStorage.removeItem('isHubAuthenticated');
             sessionStorage.removeItem('hubUserName');
+            sessionStorage.removeItem('hubSsoToken');
             location.reload();
         });
     }
 
+    // --- 5. ANIMAÇÕES (sem alterações) ---
     function animateCards() {
         const projectGrid = document.querySelector('.project-grid');
         if (!projectGrid) return;
@@ -83,8 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         card.style.transitionDelay = `${delay}ms`;
                         card.classList.add('in-view');
 
-                        // CORREÇÃO: Remove o delay após a animação para que o hover seja instantâneo
-                        const animationDuration = 300; // Duração da animação definida no CSS (transition-slow)
+                        const animationDuration = 300;
                         setTimeout(() => {
                             card.style.transitionDelay = '0ms';
                         }, delay + animationDuration);
