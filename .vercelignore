@@ -1,7 +1,3 @@
-# Ignorar arquivos antigos durante deploy
-script.js
-index.html
-
 # Ignorar arquivos de desenvolvimento
 .git
 .gitignore
