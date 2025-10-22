@@ -3,75 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hub de Projetos</title>
+    <meta name="description" content="Hub central para acessar aplicações Canella">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Security Headers via Meta Tags -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <title>Canellahub - Portal de Aplicações</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/feather-icons"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons" defer></script>
+
+    <!-- ✅ IMPORTANTE: Carregar config.js ANTES de script-improved.js -->
+    <script src="config.js" defer></script>
+    <script src="script-improved.js" defer></script>
 </head>
 <body>
 
+    <!-- TELA DE LOGIN -->
     <div id="login-container" class="hub-container">
         <header class="hub-header">
-            <img src="/logo/logo_canella.png" alt="Logo da Empresa" class="logo">
-
+            <img src="/logo/logo_canella.png" alt="Logo Canella" class="logo" loading="lazy">
             <h1>Canellahub</h1>
             <p>Por favor, faça login para continuar.</p>
         </header>
 
-        <form id="login-form" class="login-form">
-            <input type="email" id="email" name="email" placeholder="Seu email" required>
-            <input type="password" id="password" name="password" placeholder="Sua senha" required>
-            <button type="submit" id="login-button">
+        <form id="login-form" class="login-form" autocomplete="on">
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Seu email"
+                required
+                autocomplete="email"
+                aria-label="Email"
+            >
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Sua senha"
+                required
+                autocomplete="current-password"
+                aria-label="Senha"
+            >
+            <button type="submit" id="login-button" aria-label="Entrar">
                 <span class="button-text">Entrar</span>
-                <span class="loader"></span>
+                <span class="loader" aria-hidden="true"></span>
             </button>
-            <p id="login-error" class="error-message"></p>
+            <p id="login-error" class="error-message" role="alert" aria-live="polite"></p>
         </form>
-        <p class="register-link">Não tem uma conta? <a href="https://contask.canellahub.com.br/register" target="_blank">Cadastre-se</a></p>
+
+        <p class="register-link">
+            Não tem uma conta?
+            <a href="https://contask.canellahub.com.br/register" target="_blank" rel="noopener noreferrer">
+                Cadastre-se
+            </a>
+        </p>
     </div>
 
+    <!-- HUB DE APLICAÇÕES -->
     <div id="hub-content" class="hub-container" style="display: none;">
         <header class="hub-header">
             <div class="header-content">
                 <h1 id="welcome-message">Canellahub</h1>
                 <p>Selecione um sistema para continuar.</p>
             </div>
-            <button id="logout-button" class="logout-btn">Sair <i data-feather="log-out"></i></button>
+            <button id="logout-button" class="logout-btn" aria-label="Sair">
+                Sair <i data-feather="log-out" aria-hidden="true"></i>
+            </button>
         </header>
 
-        <main class="project-grid">
-            <a href="#" class="project-card">
-                <div class="card-icon"><i data-feather="briefcase"></i></div>
+        <main class="project-grid" role="main">
+            <!-- Card: Clientes Database -->
+            <a href="#" class="project-card" aria-label="Clientes Database (em breve)">
+                <div class="card-icon" aria-hidden="true">
+                    <i data-feather="briefcase"></i>
+                </div>
                 <h3>Clientes Data Base</h3>
                 <p>Consultar dados dos clientes</p>
+                <span class="badge badge-soon">Em breve</span>
             </a>
-            <a href="http://localhost:5173" class="project-card" id="contask-link">
-                <div class="card-icon"><i data-feather="bar-chart-2"></i></div>
+
+            <!-- Card: Contask -->
+            <a href="#" class="project-card" id="contask-link" aria-label="Acessar Contask">
+                <div class="card-icon" aria-hidden="true">
+                    <i data-feather="bar-chart-2"></i>
+                </div>
                 <h3>Contask</h3>
                 <p>Sistema de gestão de tarefas e produtividade</p>
+                <span class="badge badge-active">Ativo</span>
             </a>
-            <a href="#" class="project-card">
-                <div class="card-icon"><i data-feather="code"></i></div>
-                <h3>In Progress...</h3>
-                <p>In Progress...</p>
+
+            <!-- Card: Em Desenvolvimento 1 -->
+            <a href="#" class="project-card disabled" aria-label="Aplicação em desenvolvimento" aria-disabled="true">
+                <div class="card-icon" aria-hidden="true">
+                    <i data-feather="code"></i>
+                </div>
+                <h3>Em Progresso...</h3>
+                <p>Novidades em breve</p>
+                <span class="badge badge-dev">Dev</span>
             </a>
-            <a href="#" class="project-card">
-                <div class="card-icon"><i data-feather="plus-circle"></i></div>
-                <h3>In Progress...</h3>
-                <p>In Progress...</p>
+
+            <!-- Card: Em Desenvolvimento 2 -->
+            <a href="#" class="project-card disabled" aria-label="Aplicação em desenvolvimento" aria-disabled="true">
+                <div class="card-icon" aria-hidden="true">
+                    <i data-feather="plus-circle"></i>
+                </div>
+                <h3>Em Progresso...</h3>
+                <p>Novidades em breve</p>
+                <span class="badge badge-dev">Dev</span>
             </a>
         </main>
 
         <footer class="hub-footer">
-            <p>&copy; 2025</p>
+            <p>&copy; 2025 Canellahub. Todos os direitos reservados.</p>
         </footer>
     </div>
-    
-    <script src="script.js"></script>
-    <script>
-      // O feather.replace() agora é chamado pelo script.js para garantir que os ícones sempre apareçam
-    </script>
+
+    <!-- NOSCRIPT FALLBACK -->
+    <noscript>
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+            <div>
+                <h1>JavaScript Necessário</h1>
+                <p>Este site requer JavaScript para funcionar. Por favor, ative o JavaScript no seu navegador.</p>
+            </div>
+        </div>
+    </noscript>
+
 </body>
 </html>

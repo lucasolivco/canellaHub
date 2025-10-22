@@ -1,0 +1,16 @@
+# Ignorar arquivos antigos durante deploy
+script.js
+index.html
+
+# Ignorar arquivos de desenvolvimento
+.git
+.gitignore
+node_modules
+*.log
+.env
+.env.local
+.DS_Store
+Thumbs.db
+
+# README (opcional)
+README.md
