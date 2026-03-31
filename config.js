@@ -70,8 +70,8 @@ const CONFIG = {
         // Tempo máximo para tentativa de login (em ms)
         loginTimeout: 10000,
 
-        // Usar sessionStorage ao invés de localStorage para maior segurança
-        useSessionStorage: true
+        // Usar localStorage para manter sessão ao fechar aba (expira por tempo, não por aba)
+        useSessionStorage: false
     },
 
     // Configurações de UI
