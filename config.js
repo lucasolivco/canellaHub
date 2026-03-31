@@ -61,8 +61,11 @@ const CONFIG = {
 
     // Configurações de segurança
     security: {
-        // Token SSO expira em 5 minutos no backend
+        // Token SSO expira em 5 minutos no backend (uso único para redirect ao Contask)
         ssoTokenExpirationMinutes: 5,
+
+        // Sessão do hub: quanto tempo o usuário fica logado no painel
+        hubSessionDurationMinutes: 600, // 10 horas
 
         // Tempo máximo para tentativa de login (em ms)
         loginTimeout: 10000,

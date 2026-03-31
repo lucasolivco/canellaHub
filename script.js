@@ -96,12 +96,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return elapsedMinutes > security.ssoTokenExpirationMinutes;
     }
 
+    function isHubSessionExpired() {
+        const loginTimestamp = storage.get(STORAGE_KEYS.LOGIN_TIMESTAMP);
+        if (!loginTimestamp) return true;
+
+        const now = Date.now();
+        const elapsedMinutes = (now - parseInt(loginTimestamp)) / (1000 * 60);
+
+        return elapsedMinutes > security.hubSessionDurationMinutes;
+    }
+
     function isValidSession() {
         const isAuth = storage.get(STORAGE_KEYS.IS_AUTHENTICATED) === 'true';
         const hasToken = !!storage.get(STORAGE_KEYS.SSO_TOKEN);
-        const tokenValid = !isSsoTokenExpired();
+        const sessionValid = !isHubSessionExpired();
 
-        return isAuth && hasToken && tokenValid;
+        return isAuth && hasToken && sessionValid;
     }
 
     // --- FUNÇÕES DE UI ---
@@ -178,8 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.contaskLink.title = 'Token expirado. Faça login novamente.';
 
             if (ssoToken && isSsoTokenExpired()) {
-                logger.warn('Token SSO expirado. Limpando sessão...');
-                clearSession();
+                logger.warn('Token SSO expirado. Link do Contask desabilitado (sessão do hub ainda ativa).');
             }
         }
     }
