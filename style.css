@@ -66,6 +66,12 @@ body {
 }
 .hub-header p { font-size: 1.1rem; color: var(--secondary-text-color); margin-bottom: 3rem; }
 
+/* Espaçamento reduzido nos containers de autenticação */
+#login-container .hub-header p,
+#register-container .hub-header p,
+#forgot-password-container .hub-header p,
+#forgot-username-container .hub-header p { margin-bottom: 2rem; }
+
 .logo {
     max-width: 150px; /* Ajuste o tamanho conforme necessário */
     height: auto;     /* Mantém a proporção */
@@ -82,32 +88,144 @@ body {
     padding: 0.9rem 1.5rem;
     border-radius: var(--border-radius-button);
     font-size: 1rem;
-    transition: var(--transition-fast);
+    font-family: inherit;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
 }
 
 .login-form input:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(30, 203, 225, 0.2);
+    box-shadow: 0 0 0 3px rgba(30, 203, 225, 0.15),
+                0 0 20px rgba(30, 203, 225, 0.08);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
-.login-form button {
-    background-color: var(--accent-color);
+/* Acessibilidade: outline visível para navegação via teclado */
+.login-form input:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.login-form button:focus-visible,
+.password-toggle:focus-visible,
+.recovery-links a:focus-visible,
+.register-link a:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* ---- INPUT GROUP COM ÍCONE + FLOATING LABEL ---- */
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    width: 18px;
+    height: 18px;
+    color: var(--secondary-text-color);
+    transition: color 0.3s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.input-group:focus-within .input-icon {
+    color: var(--accent-color);
+}
+
+.input-group input {
+    padding-left: 2.75rem;
+    width: 100%;
+}
+
+.input-group .password-wrapper {
+    width: 100%;
+}
+
+.input-group .password-wrapper input {
+    padding-left: 2.75rem;
+}
+
+.floating-label {
+    position: absolute;
+    left: 2.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--secondary-text-color);
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 0.25rem;
+}
+
+/* Float via CSS (email — label é sibling direto do input) */
+.input-group input:focus ~ .floating-label,
+.input-group input:not(:placeholder-shown) ~ .floating-label {
+    top: -0.1rem;
+    left: 2.25rem;
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    background: linear-gradient(to bottom, transparent 45%, rgba(29, 29, 41, 0.9) 45%);
+    padding: 0 0.35rem;
+}
+
+/* Float via JS (password — label não é sibling direto) */
+.input-group.is-focused .floating-label,
+.input-group.has-value .floating-label {
+    top: -0.1rem;
+    left: 2.25rem;
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    background: linear-gradient(to bottom, transparent 45%, rgba(29, 29, 41, 0.9) 45%);
+    padding: 0 0.35rem;
+}
+
+/* ---- BOTÃO SUBMIT POLIDO ---- */
+.login-form button[type="submit"] {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #17b8cc 100%);
     color: var(--primary-text-color);
     border: none;
-    padding: 0.9rem 1rem;
+    padding: 0.95rem 1rem;
     border-radius: var(--border-radius-button);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition-fast);
+    transition: all 0.3s ease, transform 0.15s ease;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    box-shadow: 0 4px 15px rgba(30, 203, 225, 0.25);
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
 }
 
-.login-form button:hover { background-color: var(--accent-color-secondary); }
+.login-form button[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--accent-color-secondary) 0%, #c9405f 100%);
+    box-shadow: 0 4px 20px rgba(231, 81, 114, 0.3);
+    transform: translateY(-1px);
+}
+
+.login-form button[type="submit"]:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 8px rgba(231, 81, 114, 0.2);
+}
+
+.login-form button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Botões genéricos do form (toggles, etc) mantêm estilo base */
+.login-form button:not([type="submit"]) {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
 
 .register-link {
     margin-top: 1.5rem;
@@ -120,12 +238,27 @@ body {
     color: var(--accent-color);
     text-decoration: none;
     font-weight: 600;
-    transition: var(--transition-fast);
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.register-link a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--accent-color-secondary);
+    transition: width 0.3s ease;
 }
 
 .register-link a:hover {
-    text-decoration: underline;
     color: var(--accent-color-secondary);
+}
+
+.register-link a:hover::after {
+    width: 100%;
 }
 
 /* ---- SPINNER DE CARREGAMENTO (Mantido) ---- */
@@ -207,12 +340,27 @@ body {
 .recovery-links a {
     color: var(--secondary-text-color);
     text-decoration: none;
-    transition: var(--transition-fast);
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.recovery-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease;
 }
 
 .recovery-links a:hover {
     color: var(--accent-color);
-    text-decoration: underline;
+}
+
+.recovery-links a:hover::after {
+    width: 100%;
 }
 
 .recovery-links .separator {
@@ -354,8 +502,34 @@ body {
     border: 1px solid rgba(96, 165, 250, 0.25);
 }
 
+/* ---- SEPARADOR VISUAL ---- */
+.section-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+    margin: 1.25rem 0 0.75rem;
+}
+
+/* ---- CARD HOVER GLOW (auth containers) ---- */
+#login-container { transition: border-color 0.5s ease; }
+#login-container:hover { border-color: rgba(30, 203, 225, 0.15); }
+
 /* ---- OUTROS ---- */
-.error-message { color: var(--accent-color-secondary); font-size: 0.9rem; min-height: 20px; text-align: center; }
+.error-message {
+    color: var(--accent-color-secondary);
+    font-size: 0.9rem;
+    min-height: 0;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.error-message:not(:empty) {
+    opacity: 1;
+    transform: translateY(0);
+    min-height: 20px;
+}
 
 .success-message {
     color: #34d399;
@@ -396,6 +570,16 @@ body {
     .login-form { gap: 0.85rem; }
     .login-form input { padding: 0.8rem 1rem; font-size: 0.95rem; }
     .login-form button { padding: 0.8rem; }
+
+    .input-icon { left: 0.75rem; width: 16px; height: 16px; }
+    .input-group input,
+    .input-group .password-wrapper input { padding-left: 2.25rem; }
+    .floating-label { left: 2.25rem; font-size: 0.9rem; }
+
+    .input-group input:focus ~ .floating-label,
+    .input-group input:not(:placeholder-shown) ~ .floating-label,
+    .input-group.is-focused .floating-label,
+    .input-group.has-value .floating-label { left: 1.75rem; font-size: 0.7rem; }
 
     #hub-content .hub-header {
         flex-direction: column;

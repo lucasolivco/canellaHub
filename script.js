@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutButton: document.getElementById('logout-button'),
         welcomeMessage: document.getElementById('welcome-message'),
         contaskLink: document.getElementById('contask-link'),
+        loginPasswordToggle: document.getElementById('login-password-toggle'),
         // Recovery links
         forgotPasswordLink: document.getElementById('forgot-password-link'),
         forgotUsernameLink: document.getElementById('forgot-username-link'),
@@ -82,6 +83,24 @@ document.addEventListener('DOMContentLoaded', () => {
         storage.set(STORAGE_KEYS.REDIRECT_URL, redirectUrl);
         // Limpar URL sem recarregar
         window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // --- FLOATING LABELS HELPER ---
+    function initFloatingLabels() {
+        document.querySelectorAll('.input-group').forEach(group => {
+            group.querySelectorAll('input').forEach(input => {
+                function updateState() {
+                    group.classList.toggle('has-value', input.value.trim() !== '');
+                }
+                input.addEventListener('focus', () => group.classList.add('is-focused'));
+                input.addEventListener('blur', () => {
+                    group.classList.remove('is-focused');
+                    updateState();
+                });
+                input.addEventListener('input', updateState);
+                updateState();
+            });
+        });
     }
 
     // --- FUNÇÕES DE VALIDAÇÃO ---
@@ -201,6 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof feather !== 'undefined' && feather.replace) {
             feather.replace();
         }
+
+        initFloatingLabels();
     }
 
     function showForgotPassword() {
@@ -620,15 +641,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Password toggle
-    if (elements.registerPasswordToggle) {
-        elements.registerPasswordToggle.addEventListener('click', () => {
-            if (!elements.registerPassword) return;
-            const isPassword = elements.registerPassword.type === 'password';
-            elements.registerPassword.type = isPassword ? 'text' : 'password';
+    // Password toggles
+    function setupPasswordToggle(toggleElement, inputElement) {
+        if (!toggleElement || !inputElement) return;
+        toggleElement.addEventListener('click', () => {
+            const isPassword = inputElement.type === 'password';
+            inputElement.type = isPassword ? 'text' : 'password';
+            toggleElement.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
 
-            // Trocar ícone
-            const icon = elements.registerPasswordToggle.querySelector('svg') || elements.registerPasswordToggle.querySelector('i');
+            const icon = toggleElement.querySelector('svg') || toggleElement.querySelector('i');
             if (icon) {
                 icon.setAttribute('data-feather', isPassword ? 'eye-off' : 'eye');
                 if (typeof feather !== 'undefined' && feather.replace) {
@@ -637,6 +658,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    setupPasswordToggle(elements.loginPasswordToggle, document.getElementById('password'));
+    setupPasswordToggle(elements.registerPasswordToggle, elements.registerPassword);
 
     // --- ANIMAÇÕES ---
 
