@@ -48,6 +48,15 @@ body {
     box-shadow: var(--card-shadow);
 }
 
+/* Containers de autenticação (login, registro, recuperação) — mais estreitos */
+#login-container,
+#register-container,
+#forgot-password-container,
+#forgot-username-container {
+    width: 90%;
+    max-width: 450px;
+}
+
 /* ---- CABEÇALHO ---- */
 .hub-header h1 {
     font-size: 3rem;
@@ -170,11 +179,16 @@ body {
     transition-timing-function: ease-out;
 }
 
-.project-card:hover { transform: translateY(-10px); box-shadow: var(--card-hover-shadow); border-color: var(--accent-color-secondary); }
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(30, 203, 225, 0.15);
+    border-color: var(--accent-color);
+}
 
 .card-icon { margin-bottom: 1.5rem; }
 
-.card-icon i { width: 32px; height: 32px; color: var(--accent-color); }
+.card-icon i,
+.card-icon svg { width: 40px; height: 40px; color: var(--accent-color); }
 
 /* AJUSTE: Animação do ícone no hover foi removida */
 /* A regra .project-card:hover .card-icon foi deletada */
@@ -309,6 +323,36 @@ body {
     color: var(--accent-color);
 }
 
+/* ---- BADGES DE STATUS ---- */
+.badge {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    border-radius: 9999px;
+    line-height: 1.4;
+}
+
+.badge-active {
+    color: #34d399;
+    background-color: rgba(52, 211, 153, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.badge-soon {
+    color: #9ca3af;
+    background-color: rgba(156, 163, 175, 0.12);
+    border: 1px solid rgba(156, 163, 175, 0.25);
+}
+
+.badge-dev {
+    color: #60a5fa;
+    background-color: rgba(96, 165, 250, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
 /* ---- OUTROS ---- */
 .error-message { color: var(--accent-color-secondary); font-size: 0.9rem; min-height: 20px; text-align: center; }
 
@@ -324,18 +368,39 @@ body {
 
 .hub-footer { margin-top: 4rem; color: var(--secondary-text-color); font-size: 0.9rem; }
 
-/* MELHORIA: Ajustes de Responsividade para Mobile */
+/* ---- RESPONSIVIDADE ---- */
+
+/* Tablet */
+@media (max-width: 768px) {
+    body { padding: 1.5rem; }
+    .hub-container { padding: 2rem 1.5rem; }
+    .hub-header h1 { font-size: 2.4rem; }
+
+    .project-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+}
+
+/* Mobile */
 @media (max-width: 600px) {
     body { padding: 1rem; }
-    .hub-container { padding: 1.5rem; }
-    
-    .hub-header h1 { font-size: 2.2rem; } /* Fonte menor para caber melhor */
-    .hub-header p { font-size: 1rem; margin-bottom: 2rem; }
+    .hub-container { padding: 1.5rem 1.25rem; }
 
-    /* Centraliza e empilha o cabeçalho quando logado */
+    #login-container,
+    #register-container,
+    #forgot-password-container,
+    #forgot-username-container { width: 95%; }
+
+    .hub-header h1 { font-size: 1.8rem; }
+    .hub-header p { font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .login-form { gap: 0.85rem; }
+    .login-form input { padding: 0.8rem 1rem; font-size: 0.95rem; }
+    .login-form button { padding: 0.8rem; }
+
     #hub-content .hub-header {
         flex-direction: column;
         text-align: center;
         gap: 1.5rem;
     }
+
+    .project-grid { grid-template-columns: 1fr; }
 }
