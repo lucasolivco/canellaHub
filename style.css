@@ -100,12 +100,12 @@ body {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-/* Acessibilidade: outline visível para navegação via teclado */
+/* Acessibilidade: inputs usam box-shadow como indicador de foco (compatível com floating labels) */
 .login-form input:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
+    outline: none;
 }
 
+/* Outline visível via teclado para botões e links */
 .login-form button:focus-visible,
 .password-toggle:focus-visible,
 .recovery-links a:focus-visible,
