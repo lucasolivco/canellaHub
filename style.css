@@ -53,8 +53,8 @@ body {
 #register-container,
 #forgot-password-container,
 #forgot-username-container {
-    width: 90%;
-    max-width: 450px;
+    width: 92%;
+    max-width: 480px;
 }
 
 /* ---- CABEÇALHO ---- */
@@ -135,8 +135,9 @@ body {
 @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* ---- CABEÇALHO LOGADO E BOTÃO DE LOGOUT ---- */
-#hub-content .hub-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+#hub-content .hub-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
 #hub-content .header-content { text-align: left; }
+#hub-content .hub-header p { margin-bottom: 0; }
 
 .logout-btn {
     display: inline-flex; align-items: center; gap: 0.5rem;
@@ -399,8 +400,11 @@ body {
     #hub-content .hub-header {
         flex-direction: column;
         text-align: center;
-        gap: 1.5rem;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
+
+    #hub-content .header-content { text-align: center; }
 
     .project-grid { grid-template-columns: 1fr; }
 }
