@@ -38,6 +38,9 @@ const CONFIG = {
 
         endpoints: {
             hubLogin: '/auth/hub-login',
+            hubLogout: '/auth/hub-logout',
+            requestPasswordReset: '/auth/request-password-reset',
+            findUsername: '/auth/find-username',
             health: '/health'
         }
     },

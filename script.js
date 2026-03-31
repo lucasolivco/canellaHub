@@ -1,9 +1,9 @@
-// script-improved.js - Versão melhorada com segurança aprimorada
+// script.js - CanellaHub com SSO, recuperação de senha e nome de usuário
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- VERIFICAR SE CONFIG FOI CARREGADO ---
     if (!window.CanellaConfig) {
-        console.error('❌ Configuração não carregada! Certifique-se de incluir config.js antes deste script.');
+        console.error('Configuração não carregada! Certifique-se de incluir config.js antes deste script.');
         return;
     }
 
@@ -17,11 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
         IS_AUTHENTICATED: 'isHubAuthenticated',
         USER_NAME: 'hubUserName',
         SSO_TOKEN: 'hubSsoToken',
-        LOGIN_TIMESTAMP: 'hubLoginTimestamp'
+        LOGIN_TIMESTAMP: 'hubLoginTimestamp',
+        REDIRECT_URL: 'hubRedirectUrl'
     };
 
     // --- ELEMENTOS DA PÁGINA ---
     const elements = {
+        // Login
         loginContainer: document.getElementById('login-container'),
         hubContent: document.getElementById('hub-content'),
         loginForm: document.getElementById('login-form'),
@@ -29,7 +31,26 @@ document.addEventListener('DOMContentLoaded', () => {
         loginButton: document.getElementById('login-button'),
         logoutButton: document.getElementById('logout-button'),
         welcomeMessage: document.getElementById('welcome-message'),
-        contaskLink: document.getElementById('contask-link')
+        contaskLink: document.getElementById('contask-link'),
+        // Recovery links
+        forgotPasswordLink: document.getElementById('forgot-password-link'),
+        forgotUsernameLink: document.getElementById('forgot-username-link'),
+        // Forgot password
+        forgotPasswordContainer: document.getElementById('forgot-password-container'),
+        forgotPasswordForm: document.getElementById('forgot-password-form'),
+        recoveryEmail: document.getElementById('recovery-email'),
+        recoveryButton: document.getElementById('recovery-button'),
+        recoveryError: document.getElementById('recovery-error'),
+        recoverySuccess: document.getElementById('recovery-success'),
+        backToLoginFromPassword: document.getElementById('back-to-login-from-password'),
+        // Forgot username
+        forgotUsernameContainer: document.getElementById('forgot-username-container'),
+        forgotUsernameForm: document.getElementById('forgot-username-form'),
+        usernameRecoveryEmail: document.getElementById('username-recovery-email'),
+        usernameRecoveryButton: document.getElementById('username-recovery-button'),
+        usernameRecoveryError: document.getElementById('username-recovery-error'),
+        usernameRecoverySuccess: document.getElementById('username-recovery-success'),
+        backToLoginFromUsername: document.getElementById('back-to-login-from-username')
     };
 
     // --- VALIDAR ELEMENTOS ---
@@ -38,14 +59,20 @@ document.addEventListener('DOMContentLoaded', () => {
         .map(([key]) => key);
 
     if (missingElements.length > 0) {
-        logger.error('Elementos HTML ausentes:', missingElements);
+        logger.warn('Elementos HTML ausentes:', missingElements);
+    }
+
+    // --- CAPTURAR REDIRECT URL ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectUrl = urlParams.get('redirect');
+    if (redirectUrl) {
+        storage.set(STORAGE_KEYS.REDIRECT_URL, redirectUrl);
+        // Limpar URL sem recarregar
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 
     // --- FUNÇÕES DE VALIDAÇÃO ---
 
-    /**
-     * Verifica se o token SSO ainda é válido (não expirou)
-     */
     function isSsoTokenExpired() {
         const loginTimestamp = storage.get(STORAGE_KEYS.LOGIN_TIMESTAMP);
         if (!loginTimestamp) return true;
@@ -56,9 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return elapsedMinutes > security.ssoTokenExpirationMinutes;
     }
 
-    /**
-     * Valida se a sessão atual é válida
-     */
     function isValidSession() {
         const isAuth = storage.get(STORAGE_KEYS.IS_AUTHENTICATED) === 'true';
         const hasToken = !!storage.get(STORAGE_KEYS.SSO_TOKEN);
@@ -69,36 +93,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNÇÕES DE UI ---
 
-    /**
-     * Exibe mensagem de erro
-     */
-    function showError(message, duration = ui.errorMessageDuration) {
-        if (!elements.loginError) return;
+    function hideAllContainers() {
+        if (elements.loginContainer) elements.loginContainer.style.display = 'none';
+        if (elements.hubContent) elements.hubContent.style.display = 'none';
+        if (elements.forgotPasswordContainer) elements.forgotPasswordContainer.style.display = 'none';
+        if (elements.forgotUsernameContainer) elements.forgotUsernameContainer.style.display = 'none';
+    }
 
-        elements.loginError.textContent = message;
-        elements.loginError.style.display = 'block';
+    function showError(element, message, duration = ui.errorMessageDuration) {
+        if (!element) return;
+        element.textContent = message;
+        element.style.display = 'block';
 
-        // Auto-ocultar após duração especificada
         if (duration > 0) {
             setTimeout(() => {
-                elements.loginError.textContent = '';
-                elements.loginError.style.display = 'none';
+                element.textContent = '';
+                element.style.display = 'none';
             }, duration);
         }
     }
 
-    /**
-     * Limpa mensagens de erro
-     */
-    function clearError() {
-        if (!elements.loginError) return;
-        elements.loginError.textContent = '';
-        elements.loginError.style.display = 'none';
+    function showSuccess(element, message) {
+        if (!element) return;
+        element.textContent = message;
+        element.style.display = 'block';
     }
 
-    /**
-     * Exibe o hub de aplicações
-     */
+    function clearMessages(...messageElements) {
+        messageElements.forEach(el => {
+            if (el) {
+                el.textContent = '';
+                el.style.display = 'none';
+            }
+        });
+    }
+
     function showHub() {
         const userName = storage.get(STORAGE_KEYS.USER_NAME);
 
@@ -106,17 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.welcomeMessage.textContent = `Bem-vindo, ${userName}!`;
         }
 
-        if (elements.loginContainer) {
-            elements.loginContainer.style.display = 'none';
-        }
-
-        if (elements.hubContent) {
-            elements.hubContent.style.display = 'block';
-        }
+        hideAllContainers();
+        if (elements.hubContent) elements.hubContent.style.display = 'block';
 
         updateContaskLink();
 
-        // Substituir feather.replace() por código mais seguro
         if (typeof feather !== 'undefined' && feather.replace) {
             feather.replace();
         }
@@ -124,9 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         animateCards();
     }
 
-    /**
-     * Atualiza o link do Contask com o token SSO
-     */
     function updateContaskLink() {
         if (!elements.contaskLink) return;
 
@@ -143,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.contaskLink.style.cursor = 'not-allowed';
             elements.contaskLink.title = 'Token expirado. Faça login novamente.';
 
-            // Se o token expirou, limpar a sessão
             if (ssoToken && isSsoTokenExpired()) {
                 logger.warn('Token SSO expirado. Limpando sessão...');
                 clearSession();
@@ -151,64 +170,77 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Exibe o formulário de login
-     */
     function showLogin() {
-        if (elements.loginContainer) {
-            elements.loginContainer.style.display = 'block';
-        }
-
-        if (elements.hubContent) {
-            elements.hubContent.style.display = 'none';
-        }
-
-        clearError();
+        hideAllContainers();
+        if (elements.loginContainer) elements.loginContainer.style.display = 'block';
+        clearMessages(elements.loginError);
 
         if (typeof feather !== 'undefined' && feather.replace) {
             feather.replace();
         }
     }
 
-    /**
-     * Limpa a sessão do usuário
-     */
+    function showForgotPassword() {
+        hideAllContainers();
+        if (elements.forgotPasswordContainer) elements.forgotPasswordContainer.style.display = 'block';
+        clearMessages(elements.recoveryError, elements.recoverySuccess);
+    }
+
+    function showForgotUsername() {
+        hideAllContainers();
+        if (elements.forgotUsernameContainer) elements.forgotUsernameContainer.style.display = 'block';
+        clearMessages(elements.usernameRecoveryError, elements.usernameRecoverySuccess);
+    }
+
     function clearSession() {
         Object.values(STORAGE_KEYS).forEach(key => storage.remove(key));
         showLogin();
     }
 
+    // --- REDIRECT HANDLING ---
+
+    function handleRedirectAfterLogin() {
+        const storedRedirect = storage.get(STORAGE_KEYS.REDIRECT_URL);
+        if (storedRedirect) {
+            storage.remove(STORAGE_KEYS.REDIRECT_URL);
+            try {
+                const url = new URL(storedRedirect);
+                if (url.hostname.endsWith('.canellahub.com.br') || url.hostname === 'canellahub.com.br') {
+                    logger.log('Redirecionando para:', storedRedirect);
+                    window.location.href = storedRedirect;
+                    return true;
+                }
+            } catch (e) {
+                logger.warn('URL de redirect inválida:', storedRedirect);
+            }
+        }
+        return false;
+    }
+
     // --- LÓGICA DE AUTENTICAÇÃO ---
 
-    /**
-     * Realiza o login no hub
-     */
     async function handleLogin(email, password) {
         logger.log('Tentando fazer login...');
 
-        // Validações básicas
         if (!email || !password) {
-            showError('Por favor, preencha email e senha.');
+            showError(elements.loginError, 'Por favor, preencha email e senha.');
             return false;
         }
 
-        // Validação de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            showError('Email inválido.');
+            showError(elements.loginError, 'Email inválido.');
             return false;
         }
 
         try {
-            // Adicionar timeout à requisição
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), security.loginTimeout);
 
             const response = await fetch(getApiUrl('hubLogin'), {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     email: email.toLowerCase().trim(),
                     password
@@ -222,59 +254,138 @@ document.addEventListener('DOMContentLoaded', () => {
             logger.log('Resposta do servidor:', { status: response.status, autenticado: data.autenticado });
 
             if (response.ok && data.autenticado && data.ssoToken) {
-                // Validar token recebido
                 if (!isValidSsoToken(data.ssoToken)) {
-                    showError('Token de autenticação inválido.');
+                    showError(elements.loginError, 'Token de autenticação inválido.');
                     return false;
                 }
 
-                // Salvar dados da sessão
                 storage.set(STORAGE_KEYS.IS_AUTHENTICATED, 'true');
                 storage.set(STORAGE_KEYS.USER_NAME, data.userName);
                 storage.set(STORAGE_KEYS.SSO_TOKEN, data.ssoToken);
                 storage.set(STORAGE_KEYS.LOGIN_TIMESTAMP, Date.now().toString());
 
                 logger.log('Login realizado com sucesso!');
+
+                // Verificar se há redirect pendente
+                if (handleRedirectAfterLogin()) {
+                    return true;
+                }
+
                 showHub();
                 return true;
             } else {
-                showError(data.mensagem || 'Credenciais inválidas.');
+                showError(elements.loginError, data.mensagem || 'Credenciais inválidas.');
                 return false;
             }
         } catch (error) {
             logger.error('Erro ao fazer login:', error);
 
             if (error.name === 'AbortError') {
-                showError('Tempo limite de conexão excedido. Tente novamente.');
+                showError(elements.loginError, 'Tempo limite de conexão excedido. Tente novamente.');
             } else if (error.message.includes('Failed to fetch')) {
-                showError('Não foi possível conectar ao servidor. Verifique sua conexão.');
+                showError(elements.loginError, 'Não foi possível conectar ao servidor. Verifique sua conexão.');
             } else {
-                showError('Erro inesperado ao fazer login. Tente novamente.');
+                showError(elements.loginError, 'Erro inesperado ao fazer login. Tente novamente.');
             }
 
             return false;
         }
     }
 
-    /**
-     * Realiza o logout
-     */
-    function handleLogout() {
+    async function handleLogout() {
         logger.log('Fazendo logout...');
+        try {
+            await fetch(getApiUrl('hubLogout'), {
+                method: 'POST',
+                credentials: 'include'
+            });
+        } catch (e) {
+            logger.warn('Erro ao fazer logout no servidor:', e);
+        }
         clearSession();
+    }
+
+    // --- RECUPERAÇÃO DE SENHA ---
+
+    async function handleForgotPassword(email) {
+        if (!email) {
+            showError(elements.recoveryError, 'Por favor, digite seu email.');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError(elements.recoveryError, 'Email inválido.');
+            return;
+        }
+
+        try {
+            const response = await fetch(getApiUrl('requestPasswordReset'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.toLowerCase().trim() })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                clearMessages(elements.recoveryError);
+                showSuccess(elements.recoverySuccess, data.message || 'Se o email existir, você receberá instruções de recuperação.');
+            } else {
+                showError(elements.recoveryError, data.error || 'Erro ao solicitar recuperação.');
+            }
+        } catch (error) {
+            logger.error('Erro ao solicitar recuperação de senha:', error);
+            showError(elements.recoveryError, 'Não foi possível conectar ao servidor.');
+        }
+    }
+
+    // --- RECUPERAÇÃO DE NOME DE USUÁRIO ---
+
+    async function handleFindUsername(email) {
+        if (!email) {
+            showError(elements.usernameRecoveryError, 'Por favor, digite seu email.');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError(elements.usernameRecoveryError, 'Email inválido.');
+            return;
+        }
+
+        try {
+            const response = await fetch(getApiUrl('findUsername'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.toLowerCase().trim() })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                clearMessages(elements.usernameRecoveryError);
+                showSuccess(elements.usernameRecoverySuccess, data.message || 'Se o email existir, você receberá as informações.');
+            } else {
+                showError(elements.usernameRecoveryError, data.error || 'Erro ao solicitar recuperação.');
+            }
+        } catch (error) {
+            logger.error('Erro ao recuperar nome de usuário:', error);
+            showError(elements.usernameRecoveryError, 'Não foi possível conectar ao servidor.');
+        }
     }
 
     // --- EVENT LISTENERS ---
 
+    // Login form
     if (elements.loginForm) {
         elements.loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            clearError();
+            clearMessages(elements.loginError);
 
             const email = document.getElementById('email')?.value;
             const password = document.getElementById('password')?.value;
 
-            // Desabilitar botão e mostrar loading
             if (elements.loginButton) {
                 elements.loginButton.classList.add('loading');
                 elements.loginButton.disabled = true;
@@ -282,7 +393,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await handleLogin(email, password);
 
-            // Reabilitar botão
             if (elements.loginButton) {
                 elements.loginButton.classList.remove('loading');
                 elements.loginButton.disabled = false;
@@ -290,10 +400,85 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Logout
     if (elements.logoutButton) {
         elements.logoutButton.addEventListener('click', (e) => {
             e.preventDefault();
             handleLogout();
+        });
+    }
+
+    // Navigation to recovery screens
+    if (elements.forgotPasswordLink) {
+        elements.forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showForgotPassword();
+        });
+    }
+
+    if (elements.forgotUsernameLink) {
+        elements.forgotUsernameLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showForgotUsername();
+        });
+    }
+
+    // Back to login links
+    if (elements.backToLoginFromPassword) {
+        elements.backToLoginFromPassword.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+    }
+
+    if (elements.backToLoginFromUsername) {
+        elements.backToLoginFromUsername.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+    }
+
+    // Forgot password form
+    if (elements.forgotPasswordForm) {
+        elements.forgotPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages(elements.recoveryError, elements.recoverySuccess);
+
+            const email = elements.recoveryEmail?.value;
+
+            if (elements.recoveryButton) {
+                elements.recoveryButton.classList.add('loading');
+                elements.recoveryButton.disabled = true;
+            }
+
+            await handleForgotPassword(email);
+
+            if (elements.recoveryButton) {
+                elements.recoveryButton.classList.remove('loading');
+                elements.recoveryButton.disabled = false;
+            }
+        });
+    }
+
+    // Forgot username form
+    if (elements.forgotUsernameForm) {
+        elements.forgotUsernameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages(elements.usernameRecoveryError, elements.usernameRecoverySuccess);
+
+            const email = elements.usernameRecoveryEmail?.value;
+
+            if (elements.usernameRecoveryButton) {
+                elements.usernameRecoveryButton.classList.add('loading');
+                elements.usernameRecoveryButton.disabled = true;
+            }
+
+            await handleFindUsername(email);
+
+            if (elements.usernameRecoveryButton) {
+                elements.usernameRecoveryButton.classList.remove('loading');
+                elements.usernameRecoveryButton.disabled = false;
+            }
         });
     }
 
@@ -329,14 +514,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     logger.log('Inicializando Canellahub...');
 
-    // Verificar se existe sessão válida
     if (isValidSession()) {
         logger.log('Sessão válida encontrada. Mostrando hub...');
         showHub();
     } else {
         logger.log('Nenhuma sessão válida. Mostrando login...');
 
-        // Limpar dados de sessão expirada
         if (storage.get(STORAGE_KEYS.IS_AUTHENTICATED) === 'true') {
             clearSession();
         }
@@ -352,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logger.warn('Sessão expirada detectada.');
             clearSession();
         }
-    }, 60 * 1000); // 1 minuto
+    }, 60 * 1000);
 
     logger.log('Canellahub inicializado com sucesso!');
 });

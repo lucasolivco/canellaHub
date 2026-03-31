@@ -64,14 +64,80 @@
             <p id="login-error" class="error-message" role="alert" aria-live="polite"></p>
         </form>
 
+        <div class="recovery-links">
+            <a href="#" id="forgot-password-link">Esqueci minha senha</a>
+            <span class="separator">|</span>
+            <a href="#" id="forgot-username-link">Esqueci meu nome de usuário</a>
+        </div>
+
         <p class="register-link">
             Não tem uma conta?
             <a href="https://contask.canellahub.com.br/register" target="_blank" rel="noopener noreferrer">
                 Cadastre-se
             </a>
+            <br><small>Você precisará de um código de registro.</small>
         </p>
+    </div>
+
+    <!-- TELA DE RECUPERAÇÃO DE SENHA -->
+    <div id="forgot-password-container" class="hub-container" style="display: none;">
+        <header class="hub-header">
+            <img src="/logo/logo_canella.png" alt="Logo Canella" class="logo" loading="lazy">
+            <h1>Recuperar Senha</h1>
+            <p>Digite seu email para receber instruções de recuperação.</p>
+        </header>
+
+        <form id="forgot-password-form" class="login-form" autocomplete="on">
+            <input
+                type="email"
+                id="recovery-email"
+                name="email"
+                placeholder="Seu email cadastrado"
+                required
+                autocomplete="email"
+                aria-label="Email para recuperação"
+            >
+            <button type="submit" id="recovery-button" aria-label="Enviar">
+                <span class="button-text">Enviar instruções</span>
+                <span class="loader" aria-hidden="true"></span>
+            </button>
+            <p id="recovery-error" class="error-message" role="alert" aria-live="polite"></p>
+            <p id="recovery-success" class="success-message" role="status" aria-live="polite" style="display:none;"></p>
+        </form>
+
         <p class="register-link">
-            Cadastro Contask - volte para essa página ao finalizar o cadastro
+            <a href="#" id="back-to-login-from-password">Voltar ao login</a>
+        </p>
+    </div>
+
+    <!-- TELA DE RECUPERAÇÃO DE NOME DE USUÁRIO -->
+    <div id="forgot-username-container" class="hub-container" style="display: none;">
+        <header class="hub-header">
+            <img src="/logo/logo_canella.png" alt="Logo Canella" class="logo" loading="lazy">
+            <h1>Recuperar Usuário</h1>
+            <p>Digite seu email para receber seu nome de usuário.</p>
+        </header>
+
+        <form id="forgot-username-form" class="login-form" autocomplete="on">
+            <input
+                type="email"
+                id="username-recovery-email"
+                name="email"
+                placeholder="Seu email cadastrado"
+                required
+                autocomplete="email"
+                aria-label="Email para recuperação de usuário"
+            >
+            <button type="submit" id="username-recovery-button" aria-label="Enviar">
+                <span class="button-text">Enviar</span>
+                <span class="loader" aria-hidden="true"></span>
+            </button>
+            <p id="username-recovery-error" class="error-message" role="alert" aria-live="polite"></p>
+            <p id="username-recovery-success" class="success-message" role="status" aria-live="polite" style="display:none;"></p>
+        </form>
+
+        <p class="register-link">
+            <a href="#" id="back-to-login-from-username">Voltar ao login</a>
         </p>
     </div>
 

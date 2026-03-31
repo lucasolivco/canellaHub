@@ -182,8 +182,42 @@ body {
 .project-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
 .project-card p { font-size: 0.95rem; color: var(--secondary-text-color); line-height: 1.6; }
 
+/* ---- LINKS DE RECUPERAÇÃO ---- */
+.recovery-links {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.recovery-links a {
+    color: var(--secondary-text-color);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.recovery-links a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.recovery-links .separator {
+    color: rgba(255, 255, 255, 0.2);
+    margin: 0 0.5rem;
+}
+
 /* ---- OUTROS ---- */
 .error-message { color: var(--accent-color-secondary); font-size: 0.9rem; min-height: 20px; text-align: center; }
+
+.success-message {
+    color: #34d399;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 0.75rem;
+    background-color: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    border-radius: var(--border-radius-button);
+}
+
 .hub-footer { margin-top: 4rem; color: var(--secondary-text-color); font-size: 0.9rem; }
 
 /* MELHORIA: Ajustes de Responsividade para Mobile */
