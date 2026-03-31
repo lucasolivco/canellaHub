@@ -50,7 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
         usernameRecoveryButton: document.getElementById('username-recovery-button'),
         usernameRecoveryError: document.getElementById('username-recovery-error'),
         usernameRecoverySuccess: document.getElementById('username-recovery-success'),
-        backToLoginFromUsername: document.getElementById('back-to-login-from-username')
+        backToLoginFromUsername: document.getElementById('back-to-login-from-username'),
+        // Register
+        registerContainer: document.getElementById('register-container'),
+        registerForm: document.getElementById('register-form'),
+        registerName: document.getElementById('register-name'),
+        registerEmail: document.getElementById('register-email'),
+        registerPassword: document.getElementById('register-password'),
+        registerCode: document.getElementById('register-code'),
+        registerButton: document.getElementById('register-button'),
+        registerError: document.getElementById('register-error'),
+        registerSuccess: document.getElementById('register-success'),
+        registerLink: document.getElementById('register-link'),
+        backToLoginFromRegister: document.getElementById('back-to-login-from-register'),
+        registerPasswordToggle: document.getElementById('register-password-toggle')
     };
 
     // --- VALIDAR ELEMENTOS ---
@@ -98,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.hubContent) elements.hubContent.style.display = 'none';
         if (elements.forgotPasswordContainer) elements.forgotPasswordContainer.style.display = 'none';
         if (elements.forgotUsernameContainer) elements.forgotUsernameContainer.style.display = 'none';
+        if (elements.registerContainer) elements.registerContainer.style.display = 'none';
     }
 
     function showError(element, message, duration = ui.errorMessageDuration) {
@@ -190,6 +204,16 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAllContainers();
         if (elements.forgotUsernameContainer) elements.forgotUsernameContainer.style.display = 'block';
         clearMessages(elements.usernameRecoveryError, elements.usernameRecoverySuccess);
+    }
+
+    function showRegister() {
+        hideAllContainers();
+        if (elements.registerContainer) elements.registerContainer.style.display = 'block';
+        clearMessages(elements.registerError, elements.registerSuccess);
+
+        if (typeof feather !== 'undefined' && feather.replace) {
+            feather.replace();
+        }
     }
 
     function clearSession() {
@@ -375,6 +399,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- CADASTRO ---
+
+    async function handleRegister() {
+        const name = elements.registerName?.value?.trim();
+        const email = elements.registerEmail?.value?.trim()?.toLowerCase();
+        const password = elements.registerPassword?.value;
+        const registrationCode = elements.registerCode?.value?.trim();
+        const role = document.querySelector('input[name="register-role"]:checked')?.value || 'EMPLOYEE';
+
+        // Validação client-side
+        if (!name || name.length < 2) {
+            showError(elements.registerError, 'Nome deve ter pelo menos 2 caracteres.');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            showError(elements.registerError, 'Email inválido.');
+            return;
+        }
+
+        if (!password || password.length < 6) {
+            showError(elements.registerError, 'Senha deve ter pelo menos 6 caracteres.');
+            return;
+        }
+
+        if (!registrationCode) {
+            showError(elements.registerError, 'Código de registro é obrigatório.');
+            return;
+        }
+
+        try {
+            const response = await fetch(getApiUrl('register'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, registrationCode, role })
+            });
+
+            const data = await response.json();
+
+            if (response.status === 201) {
+                clearMessages(elements.registerError);
+                showSuccess(
+                    elements.registerSuccess,
+                    `Conta criada com sucesso! Um email de verificação foi enviado para ${email}. Verifique sua caixa de entrada para ativar sua conta.`
+                );
+
+                // Desabilitar formulário após sucesso
+                if (elements.registerForm) {
+                    Array.from(elements.registerForm.elements).forEach(el => el.disabled = true);
+                }
+
+                // Voltar ao login após 5 segundos
+                setTimeout(() => {
+                    if (elements.registerForm) {
+                        elements.registerForm.reset();
+                        Array.from(elements.registerForm.elements).forEach(el => el.disabled = false);
+                    }
+                    showLogin();
+                }, 5000);
+            } else {
+                showError(elements.registerError, data.error || 'Erro ao criar conta. Tente novamente.', 0);
+            }
+        } catch (error) {
+            logger.error('Erro ao registrar:', error);
+            showError(elements.registerError, 'Não foi possível conectar ao servidor. Tente novamente.');
+        }
+    }
+
     // --- EVENT LISTENERS ---
 
     // Login form
@@ -478,6 +571,60 @@ document.addEventListener('DOMContentLoaded', () => {
             if (elements.usernameRecoveryButton) {
                 elements.usernameRecoveryButton.classList.remove('loading');
                 elements.usernameRecoveryButton.disabled = false;
+            }
+        });
+    }
+
+    // Register link
+    if (elements.registerLink) {
+        elements.registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegister();
+        });
+    }
+
+    // Back to login from register
+    if (elements.backToLoginFromRegister) {
+        elements.backToLoginFromRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+    }
+
+    // Register form
+    if (elements.registerForm) {
+        elements.registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages(elements.registerError, elements.registerSuccess);
+
+            if (elements.registerButton) {
+                elements.registerButton.classList.add('loading');
+                elements.registerButton.disabled = true;
+            }
+
+            await handleRegister();
+
+            if (elements.registerButton) {
+                elements.registerButton.classList.remove('loading');
+                elements.registerButton.disabled = false;
+            }
+        });
+    }
+
+    // Password toggle
+    if (elements.registerPasswordToggle) {
+        elements.registerPasswordToggle.addEventListener('click', () => {
+            if (!elements.registerPassword) return;
+            const isPassword = elements.registerPassword.type === 'password';
+            elements.registerPassword.type = isPassword ? 'text' : 'password';
+
+            // Trocar ícone
+            const icon = elements.registerPasswordToggle.querySelector('svg') || elements.registerPasswordToggle.querySelector('i');
+            if (icon) {
+                icon.setAttribute('data-feather', isPassword ? 'eye-off' : 'eye');
+                if (typeof feather !== 'undefined' && feather.replace) {
+                    feather.replace();
+                }
             }
         });
     }

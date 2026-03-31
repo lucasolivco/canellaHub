@@ -72,10 +72,98 @@
 
         <p class="register-link">
             Não tem uma conta?
-            <a href="https://contask.canellahub.com.br/register" target="_blank" rel="noopener noreferrer">
-                Cadastre-se
-            </a>
+            <a href="#" id="register-link">Cadastre-se</a>
             <br><small>Você precisará de um código de registro.</small>
+        </p>
+    </div>
+
+    <!-- TELA DE CADASTRO -->
+    <div id="register-container" class="hub-container" style="display: none;">
+        <header class="hub-header">
+            <img src="/logo/logo_canella.png" alt="Logo Canella" class="logo" loading="lazy">
+            <h1>Criar Conta</h1>
+            <p>Preencha os dados abaixo para se cadastrar.</p>
+        </header>
+
+        <form id="register-form" class="login-form" autocomplete="on">
+            <input
+                type="text"
+                id="register-name"
+                name="name"
+                placeholder="Seu nome completo"
+                required
+                minlength="2"
+                autocomplete="name"
+                aria-label="Nome completo"
+            >
+            <input
+                type="email"
+                id="register-email"
+                name="email"
+                placeholder="Seu email"
+                required
+                autocomplete="email"
+                aria-label="Email"
+            >
+            <div class="password-wrapper">
+                <input
+                    type="password"
+                    id="register-password"
+                    name="password"
+                    placeholder="Senha (mínimo 6 caracteres)"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    aria-label="Senha"
+                >
+                <button type="button" id="register-password-toggle" class="password-toggle" aria-label="Mostrar/ocultar senha">
+                    <i data-feather="eye" aria-hidden="true"></i>
+                </button>
+            </div>
+            <input
+                type="text"
+                id="register-code"
+                name="registrationCode"
+                placeholder="Código de registro"
+                required
+                autocomplete="off"
+                aria-label="Código de registro"
+            >
+            <p class="helper-text">Solicite o código ao administrador do sistema.</p>
+
+            <div class="role-selector">
+                <label class="role-option">
+                    <input type="radio" name="register-role" value="EMPLOYEE" checked>
+                    <span class="role-label">
+                        <i data-feather="user" aria-hidden="true"></i>
+                        <span>
+                            <strong>Colaborador</strong>
+                            <small>Executar tarefas e colaborar</small>
+                        </span>
+                    </span>
+                </label>
+                <label class="role-option">
+                    <input type="radio" name="register-role" value="MANAGER">
+                    <span class="role-label">
+                        <i data-feather="users" aria-hidden="true"></i>
+                        <span>
+                            <strong>Gerente</strong>
+                            <small>Gerenciar equipe e atribuir tarefas</small>
+                        </span>
+                    </span>
+                </label>
+            </div>
+
+            <button type="submit" id="register-button" aria-label="Criar conta">
+                <span class="button-text">Criar conta</span>
+                <span class="loader" aria-hidden="true"></span>
+            </button>
+            <p id="register-error" class="error-message" role="alert" aria-live="polite"></p>
+            <p id="register-success" class="success-message" role="status" aria-live="polite" style="display:none;"></p>
+        </form>
+
+        <p class="register-link">
+            <a href="#" id="back-to-login-from-register">Voltar ao login</a>
         </p>
     </div>
 

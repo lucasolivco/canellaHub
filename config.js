@@ -41,6 +41,7 @@ const CONFIG = {
             hubLogout: '/auth/hub-logout',
             requestPasswordReset: '/auth/request-password-reset',
             findUsername: '/auth/find-username',
+            register: '/auth/register',
             health: '/health'
         }
     },
