@@ -27,7 +27,7 @@ body {
     background-color: #101018;
     background-image: radial-gradient(circle at 100% 0%, rgba(231, 81, 114, 0.2) 0%, transparent 40%),
                       radial-gradient(circle at 0% 100%, rgba(30, 203, 225, 0.2) 0%, transparent 40%);
-    background-attachment: fixed;
+    background-attachment: scroll;
 }
 
 /* ---- ANIMAÇÕES (Mantidas) ---- */
@@ -289,9 +289,7 @@ body {
 .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; width: 100%; }
 
 .project-card {
-    background: rgba(40, 40, 56, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(40, 40, 56, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--border-radius-card);
     padding: 2rem 1.5rem;
@@ -302,6 +300,7 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     text-align: left;
     opacity: 0; transform: translateY(20px);
+    will-change: transform;
 }
 
 .project-card.in-view { 
