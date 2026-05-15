@@ -187,6 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
             feather.replace();
         }
 
+        // Injetar nome do usuario nos links do FiscoPrev para rastreamento de curadoria
+        if (userName) {
+            document.querySelectorAll('a[href*="fiscoprev.canellahub.com.br"]').forEach(link => {
+                try {
+                    const url = new URL(link.href);
+                    url.searchParams.set('operador', userName);
+                    link.href = url.toString();
+                } catch (e) {}
+            });
+        }
+
         animateCards();
     }
 
