@@ -187,9 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
             feather.replace();
         }
 
-        // Injetar nome do usuario nos links do FiscoPrev para rastreamento de curadoria
+        // Injetar nome do usuario nos links que rastreiam autoria/curadoria
+        // (FiscoPrev e Sucesso do Cliente v2). O app lê ?operador= e envia em X-Operador.
         if (userName) {
-            document.querySelectorAll('a[href*="fiscoprev.canellahub.com.br"]').forEach(link => {
+            document.querySelectorAll('a[href*="fiscoprev.canellahub.com.br"], a[href*="gestaovendas.canellahub.com.br/cs-v2.html"]').forEach(link => {
                 try {
                     const url = new URL(link.href);
                     url.searchParams.set('operador', userName);
